@@ -1,0 +1,5 @@
+.DS_Store
+node_modules/
+releases/
+*.cookie-stitch.json
+!examples/first-cookie.cookie-stitch.json

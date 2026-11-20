@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fbf6ed"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Cookie Stitch">
+<meta name="description" content="Find colours, park threads and keep going one stitch at a time." data-i18n-content="metaDescription">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="cookie-icon-32.png" type="image/png" sizes="32x32"><link rel="apple-touch-icon" href="cookie-icon-180.png" sizes="180x180">
+<title>Cookie Stitch</title><link rel="stylesheet" href="style.css?v=0.3.3">
+</head>
+<body>
+<section id="importPanel" class="local-import" aria-labelledby="welcomeTitle">
+ <div class="welcome-content">
+  <img class="welcome-logo" src="cookie-icon-192.png" width="112" height="112" alt="">
+  <h1 id="welcomeTitle">Cookie Stitch</h1>
+  <p class="welcome-tagline">ONE LITTLE STITCH AT A TIME</p>
+  <span class="welcome-version">Version 0.3.3</span>
+  <div id="welcomeProject" class="welcome-project" hidden>
+   <div class="eyebrow" data-i18n="welcomeProjectLabel">YOUR PROJECT</div><h2 id="welcomeProjectTitle"></h2>
+   <div class="welcome-progress-track"><div id="welcomeProgressFill"></div></div>
+   <p id="welcomeProgressText"></p>
+  </div>
+  <p id="welcomeIntro" class="welcome-intro"><span data-i18n="welcomeIntroFirst">A new piece starts with a single stitch.</span><br><span data-i18n="welcomeIntroSecond">Open your prepared project.</span></p>
+  <button id="continueProject" class="primary-button welcome-continue" hidden><span data-i18n="welcomeContinue">Continue stitching</span> <span aria-hidden="true">→</span></button>
+  <button id="chooseProject" class="primary-button welcome-open" disabled data-i18n="projects">My projects</button>
+  <p id="welcomeStorage" class="welcome-storage" data-i18n="welcomeStorage">Your pattern and progress are saved on this device.</p>
+  <label class="welcome-language"><span data-i18n="language">Language / Sprache</span>
+   <select id="welcomeLanguage"><option value="en" lang="en">English</option><option value="de" lang="de">Deutsch</option></select>
+  </label>
+  <p id="localError" role="alert"></p>
+ </div>
+</section>
+<input id="localFile" type="file" accept="application/json,.json" hidden>
+<div id="offlineStatus" role="status" data-i18n="offlineChecking">Checking offline availability …</div>
+
+<div class="app-shell" id="appShell" hidden>
+<header class="app-header">
+ <div class="brand" aria-label="Cookie Stitch"><img class="brand-icon" src="cookie-icon-192.png" width="44" height="44" alt=""><span class="brand-wordmark">Cookie Stitch<span class="brand-caption">ONE LITTLE STITCH AT A TIME</span></span></div>
+ <span class="header-divider"></span><div class="project-heading"><h1 data-i18n="projectHeading">Your project</h1><span data-i18n="localDevice">On this device</span></div>
+ <div class="header-right"><span id="saveStatus" class="save-status" role="status" data-i18n="loading">Loading …</span><button class="icon-button" id="helpButton" aria-label="Open help" data-i18n-aria-label="helpOpen" title="Help" data-i18n-title="help">?</button><button class="subtle-button" id="backupButton" data-i18n="backup">↓ Backup</button><button class="icon-button" id="menuButton" aria-expanded="false" aria-controls="projectMenu" aria-label="Open project menu" data-i18n-aria-label="projectMenuOpen" title="Project menu" data-i18n-title="projectMenu">•••</button></div>
+</header>
+<main>
+ <aside class="sidebar" id="sidebar">
+  <section class="project-progress"><div class="eyebrow" data-i18n="progressEyebrow">STITCH BY STITCH</div><div class="progress-heading"><span data-i18n="progressHeading">Your pattern is growing</span><strong id="totalPercent">0 %</strong></div><div class="progress-track"><div id="progressFill"></div></div><p id="totalCount" data-i18n="noProject">No project yet</p></section>
+  <div class="palette-heading"><h2><span data-i18n="threadColors">Thread colours</span> <span>—</span></h2><button class="text-button" id="nextColor" title="Next unfinished colour" data-i18n-title="nextColorTitle" data-i18n="nextColor">Next →</button></div>
+  <div class="search-wrap"><span aria-hidden="true">⌕</span><input id="colorSearch" type="search" autocapitalize="off" spellcheck="false" placeholder="Search DMC number" data-i18n-placeholder="search" aria-label="Find a thread colour by DMC number" data-i18n-aria-label="searchAria"></div>
+  <div class="palette-labels"><span data-i18n="colorSymbol">COLOUR / SYMBOL</span><span data-i18n="remainingLabel">REMAINING</span></div>
+  <div id="palette" class="palette" role="group" aria-label="DMC thread colours" data-i18n-aria-label="paletteAria"></div>
+  <div class="sidebar-footer"><span class="verified-dot"></span><span data-i18n="localPattern">Locally stored pattern</span> <button class="text-button" id="importInfo" aria-label="About this pattern" data-i18n-aria-label="localPatternInfo">ⓘ</button></div>
+ </aside>
+ <section class="workspace" aria-label="Stitch pattern" data-i18n-aria-label="chartLabel">
+  <div class="workspace-top"><button class="icon-button mobile-palette" id="paletteToggle" aria-label="Show thread colours" data-i18n-aria-label="paletteToggle" aria-expanded="false">☷</button><div class="current-color"><span class="symbol current-symbol" id="activeSymbol"></span><div><div class="eyebrow" data-i18n="currentColor">CURRENT COLOUR</div><strong id="activeDmc">DMC —</strong></div></div><div class="color-stats"><span><b id="activeRemaining">—</b> <span data-i18n="openCount">left</span></span><span class="planned-label"><i></i><b id="activeParked">0</b> <span data-i18n="parkedCount">parked</span></span><span><b id="activeDone">0</b> <span data-i18n="doneCount">done</span></span></div><label class="filter-toggle"><input id="isolate" type="checkbox" checked><span class="switch"></span><span data-i18n="highlight">Highlight colour</span></label></div>
+  <div class="tools-row"><div class="mode-tools" role="group" aria-label="Tool" data-i18n-aria-label="tool"><button data-mode="pan" class="active" aria-pressed="true"><span>✥</span><span data-i18n="pan">Move</span></button><button data-mode="park" aria-pressed="false"><span>⚑</span><span data-i18n="park">Park thread</span></button><button data-mode="done" aria-pressed="false"><span>✓</span><span data-i18n="done">Mark done</span></button><button data-mode="erase" aria-pressed="false"><span>⌫</span><span data-i18n="erase">Correct</span></button></div><div class="history-tools"><button class="icon-button" id="undo" aria-label="Undo" data-i18n-aria-label="undo" title="Undo (⌘Z)" data-i18n-title="undoTitle" disabled>↶</button><button class="icon-button" id="redo" aria-label="Redo" data-i18n-aria-label="redo" title="Redo (⌘⇧Z)" data-i18n-title="redoTitle" disabled>↷</button></div></div>
+  <div class="chart-wrap" id="chartWrap"><canvas id="chart" tabindex="0" aria-label="Interactive stitch pattern. In Move mode, tap a stitch to pick its colour. Use Park thread to park a thread or Mark done to mark finished stitches." data-i18n-aria-label="chartAria"></canvas><div id="loading" class="loading"><span class="loading-spinner"></span><span data-i18n="preparing">Preparing your pattern …</span></div>
+   <button id="focusCollection" class="focus-collection" aria-label="Open your cookie collection" data-i18n-aria-label="collectionOpen" title="Your cookie collection" data-i18n-title="collection" hidden><span aria-hidden="true">🍪</span></button>
+   <button id="reviewNext" class="review-next" hidden></button>
+   <button id="focusToggle" class="focus-toggle" aria-pressed="false" title="Hide controls (F)" data-i18n-title="focusHide"><span aria-hidden="true">⤢</span><span id="focusLabel" data-i18n="focus">Focus</span></button>
+   <div class="focus-tools" id="focusTools">
+    <div class="focus-tools-panel" id="focusToolsPanel">
+     <div class="mode-tools" role="group" aria-label="Focus mode tools" data-i18n-aria-label="focusTools">
+      <button data-mode="pan" aria-pressed="true"><span>✥</span><span data-i18n="pan">Move</span></button>
+      <button data-mode="park" aria-pressed="false"><span>⚑</span><span data-i18n="park">Park thread</span></button>
+      <button data-mode="done" aria-pressed="false"><span>✓</span><span data-i18n="done">Mark done</span></button>
+      <button data-mode="erase" aria-pressed="false"><span>⌫</span><span data-i18n="erase">Correct</span></button>
+     </div>
+     <label class="filter-toggle"><input id="focusIsolate" type="checkbox" checked><span class="switch"></span><span data-i18n="highlight">Highlight colour</span></label>
+    </div>
+    <button class="focus-tools-toggle" id="focusToolsToggle" aria-expanded="true" aria-controls="focusToolsPanel"><span id="focusToolName" data-i18n="pan">Move</span><span aria-hidden="true"> · </span><span data-i18n="tools">Tools</span> <span id="focusToolsChevron" aria-hidden="true">⌄</span></button>
+   </div>
+   <div class="chart-hint" id="modeHint" data-i18n="panHint">Drag to move · Tap a stitch to select its colour · Pinch to zoom</div>
+   <div class="minimap-box"><div class="eyebrow" data-i18n="minimap">YOUR VIEW</div><canvas id="minimap" width="128" height="225" aria-label="Pattern overview. Tap to jump to a location." data-i18n-aria-label="minimapAria" tabindex="0"></canvas><span data-i18n="minimapHint">Tap to navigate</span></div>
+   <div class="zoom-controls"><button id="zoomOut" aria-label="Zoom out" data-i18n-aria-label="zoomOut">−</button><span id="zoomLabel">100 %</span><button id="zoomIn" aria-label="Zoom in" data-i18n-aria-label="zoomIn">+</button><span class="zoom-divider"></span><button id="fit" aria-label="Show entire pattern" data-i18n-aria-label="fitAria" title="Entire pattern" data-i18n-title="fit">⛶</button></div>
+   <div class="coordinates" id="coordinates" data-i18n="coordinatesEmpty">Column — · Row —</div>
+  </div>
+
+ </section>
+</main>
+</div>
+<dialog id="infoDialog"><button class="dialog-close icon-button" aria-label="Close" data-i18n-aria-label="close">×</button><div id="dialogContent"></div><button class="primary-button dialog-ok" data-i18n="okay">Got it</button></dialog>
+<dialog id="projectsDialog" class="projects-dialog" aria-labelledby="projectsTitle">
+ <header class="projects-header">
+  <h2 id="projectsTitle" data-i18n="projects">My projects</h2>
+  <form method="dialog"><button class="icon-button" id="closeProjects" aria-label="Close project list" data-i18n-aria-label="closeProjects">×</button></form>
+ </header>
+ <p id="projectListStatus" role="status"></p>
+ <ul id="projectList" class="project-list"></ul>
+ <p id="projectListError" role="alert"></p>
+ <footer class="projects-footer"><button class="primary-button" id="addProjectFile" data-i18n="addProject">Add project file</button></footer>
+</dialog>
+<dialog id="restoreDialog"><h2 data-i18n="restoreTitle">Restore backup?</h2><p id="restoreSummary"></p><p data-i18n="restoreWarning">This replaces your current progress. You can undo the restore afterwards.</p><div class="dialog-actions"><button class="subtle-button" id="cancelRestore" data-i18n="cancel">Cancel</button><button class="primary-button" id="confirmRestore" data-i18n="restore">Restore</button></div></dialog>
+<dialog id="supplementDialog" aria-labelledby="supplementTitle" aria-describedby="supplementSummary">
+ <h2 id="supplementTitle" data-i18n="supplementTitle">Add prepared progress?</h2>
+ <p id="supplementSummary"></p>
+ <div class="dialog-actions">
+  <button class="subtle-button" id="cancelSupplement" data-i18n="cancel" autofocus>Cancel</button>
+  <button class="primary-button" id="confirmSupplement" data-i18n="supplementApply">Add progress</button>
+ </div>
+</dialog>
+<div id="projectMenu" class="project-menu" hidden><button id="openLocalProject" data-i18n="switchProject">Switch project …</button><button id="supplementProgress" data-i18n="supplement">Add prepared progress …</button><button id="recoveryBackup" data-i18n="exportRecovery">Export previous local progress …</button><button id="restoreButton" data-i18n="restoreProgress">Restore progress …</button><label class="project-language"><span data-i18n="language">Language / Sprache</span>
+ <select id="projectLanguage"><option value="en" lang="en">English</option><option value="de" lang="de">Deutsch</option></select>
+</label></div>
+<input type="file" id="restoreInput" accept="application/json,.json" hidden>
+<div id="storageWarning" role="alert" hidden><span data-i18n="saveWarning">Your latest changes could not be saved. Back them up to a file now.</span> <button id="emergencyBackup" data-i18n="saveNow">Back up now</button></div>
+<button id="achievementNotice" class="achievement-notice" role="status" hidden></button>
+<div id="toast" role="status" class="toast" hidden></div>
+<script type="module" src="app.mjs?v=0.3.3"></script>
+</body></html>
